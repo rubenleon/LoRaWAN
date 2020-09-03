@@ -1,6 +1,7 @@
-""" Defines the BOARD class that contains the board pin mappings. """
+""" Defines the BOARD class that contains the board pin mappings and RF module HF/LF info. """
+# -*- coding: utf-8 -*-
 
-# Copyright 2015 Mayer Analytics Ltd.
+# Copyright 2015-2018 Mayer Analytics Ltd.
 #
 # This file is part of pySX127x.
 #
@@ -28,7 +29,8 @@ import time
 
 class BOARD:
     """ Board initialisation/teardown and pin configuration is kept here.
-        This is the Raspberry Pi board with one LED and a modtronix inAir9B
+        Also, information about the RF module is kept here.
+        This is the Raspberry Pi board with one LED and a modtronix inAir9B.
     """
     # Note that the BCOM numbering for the GPIOs is used.
     DIO0 = 22   # RaspPi GPIO 22
@@ -40,6 +42,11 @@ class BOARD:
 
     # The spi object is kept here
     spi = None
+    
+    # tell pySX127x here whether the attached RF module uses low-band (RF*_LF pins) or high-band (RF*_HF pins).
+    # low band (called band 1&2) are 137-175 and 410-525
+    # high band (called band 3) is 862-1020
+    low_band = True
 
     @staticmethod
     def setup():
@@ -74,6 +81,7 @@ class BOARD:
         """
         BOARD.spi = spidev.SpiDev()
         BOARD.spi.open(spi_bus, spi_cs)
+        BOARD.spi.max_speed_hz = 5000000    # SX127x can go up to 10MHz, pick half that to be safe
         return BOARD.spi
 
     @staticmethod
